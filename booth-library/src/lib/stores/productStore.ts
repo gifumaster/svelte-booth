@@ -1,22 +1,47 @@
-import { persisted } from 'svelte-local-storage-store';
-import type { Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export interface Product {
-    title: string;
     url: string;
-    imgUrl: string;
+    title: string;
+    price: number;
+    imageUrl: string;
     tags: string[];
 }
 
-interface ProductStore {
+// タグのマスターデータを管理するストア
+export const tagMasterStore = writable<string[]>([]);
+
+// プロダクトを管理するストア
+export const productStore = writable<{
     items: Product[];
     selectedTags: string[];
-}
-
-export const productStore: Writable<ProductStore> = persisted('product-store', {
+}>({
     items: [],
     selectedTags: []
 });
+
+// タグマスターの操作関数
+export function addToTagMaster(tag: string) {
+    tagMasterStore.update(tags => {
+        if (!tags.includes(tag)) {
+            return [...tags, tag];
+        }
+        return tags;
+    });
+}
+
+export function removeFromTagMaster(tag: string) {
+    let isTagInUse = false;
+    productStore.subscribe(store => {
+        isTagInUse = store.items.some(item => item.tags.includes(tag));
+    })();
+
+    if (!isTagInUse) {
+        tagMasterStore.update(tags => tags.filter(t => t !== tag));
+        return true;
+    }
+    return false;
+}
 
 // Initialize store with contents.json data only if store is empty
 const loadInitialData = async () => {

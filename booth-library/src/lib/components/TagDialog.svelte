@@ -1,24 +1,26 @@
 <script lang="ts">
-    import { productStore, type Product } from '../stores/productStore';
-    let { product, onClose, availableTags } = $props<{
+    import { productStore, tagMasterStore, addToTagMaster, type Product } from '../stores/productStore';
+    let { product, onClose } = $props<{
         product: Product;
         onClose: () => void;
-        availableTags: string[];
     }>();
     let newTag = $state('');
-    let visibleTags = $state(availableTags);
     
-    // productStoreを購読して現在の商品情報を取得
+    // productStoreとtagMasterStoreを購読
     let currentProduct = $derived($productStore.items.find(item => item.url === product.url) || product);
+    let masterTags = $derived($tagMasterStore);
 
     // 現在の商品に追加されていないタグをフィルタリング
     let availableNewTags = $derived(
-        visibleTags.filter((tag: string) => !currentProduct.tags.includes(tag))
+        masterTags.filter((tag: string) => !currentProduct.tags.includes(tag))
     );
 
     function addTag(tagToAdd: string = newTag) {
         if (!tagToAdd || tagToAdd.length > 10 || currentProduct.tags.length >= 20) return;
         
+        // 新しいタグの場合はマスターに追加
+        addToTagMaster(tagToAdd);
+
         productStore.update(store => ({
             ...store,
             items: store.items.map(item => 
@@ -27,10 +29,6 @@
                     : item
             )
         }));
-        // クリックされたタグを非表示にする
-        if (tagToAdd !== newTag) {
-            visibleTags = visibleTags.filter((tag: string) => tag !== tagToAdd);
-        }
         newTag = '';
     }
 
@@ -43,10 +41,6 @@
                     : item
             )
         }));
-        // 除外したタグを利用可能なタグリストに戻す
-        if (!visibleTags.includes(tagToRemove)) {
-            visibleTags = [...visibleTags, tagToRemove];
-        }
     }
 
     function handleOverlayClick(e: MouseEvent) {
@@ -77,7 +71,7 @@
                         <button 
                             class="tag available"
                             onclick={() => addTag(tag)}
-                            disabled={currentProduct.tags.length >= 10}
+                            disabled={currentProduct.tags.length >= 20}
                         >
                             {tag} +
                         </button>
@@ -95,7 +89,7 @@
             />
             <button 
                 onclick={() => addTag()}
-                disabled={!newTag || newTag.length > 10 || currentProduct.tags.length >= 10}
+                disabled={!newTag || newTag.length > 10 || currentProduct.tags.length >= 20}
             >
                 追加
             </button>

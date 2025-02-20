@@ -1,15 +1,11 @@
 <script lang="ts">
-    import { productStore, type Product } from '../stores/productStore';
+    import { productStore, tagMasterStore, removeFromTagMaster, type Product } from '../stores/productStore';
     import TagDialog from './TagDialog.svelte';
-    import { Link2, Tag } from 'lucide-svelte';
+    import { Link, Tag } from 'lucide-svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let { items, selectedTags } = $derived($productStore);
-
-    // Get all unique tags from all products
-    let allTags = $derived(
-        Array.from(new Set(items.flatMap(item => item.tags)))
-    );
+    let masterTags = $derived($tagMasterStore);
 
     // Filter products based on selected tags
     let filteredProducts = $derived(
@@ -29,7 +25,20 @@
         }));
     }
 
-    function handleContextMenu(event: MouseEvent, product: Product) {
+    function handleContextMenu(event: MouseEvent, tag: string) {
+        event.preventDefault();
+        if (removeFromTagMaster(tag)) {
+            // タグが削除された場合、選択中のタグからも削除
+            productStore.update(store => ({
+                ...store,
+                selectedTags: store.selectedTags.filter(t => t !== tag)
+            }));
+        } else {
+            alert('このタグは商品で使用されているため削除できません。');
+        }
+    }
+
+    function handleProductContextMenu(event: MouseEvent, product: Product) {
         event.preventDefault();
         selectedProduct = product;
     }
@@ -39,11 +48,13 @@
     <div class="tag-filter">
         <h3>タグフィルター</h3>
         <div class="tag-list">
-            {#each allTags as tag}
+            {#each masterTags as tag}
                 <button 
                     class="tag"
                     class:selected={selectedTags.includes(tag)}
                     onclick={() => toggleTag(tag)}
+                    oncontextmenu={(e) => handleContextMenu(e, tag)}
+                    title="右クリックでタグを削除"
                 >
                     {tag}
                 </button>
@@ -55,8 +66,9 @@
         {#each filteredProducts as product}
             <div 
                 class="product-card"
+                oncontextmenu={(e) => handleProductContextMenu(e, product)}
             >
-                <img src={product.imgUrl} alt={product.title} />
+                <img src={product.imageUrl} alt={product.title} />
                 <div class="title-actions">
                     <h4>{product.title}</h4>
                     <div class="action-icons">
@@ -74,7 +86,7 @@
                             class="icon-button" 
                             title="商品ページへ"
                         >
-                            <Link2 size={18} />
+                            <Link size={18} />
                         </a>
                     </div>
                 </div>
@@ -91,7 +103,6 @@
         <TagDialog 
             product={selectedProduct}
             onClose={() => selectedProduct = null}
-            availableTags={allTags}
         />
     {/if}
 </div>
