@@ -1,2 +1,21 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+    import ProductGrid from '$lib/components/ProductGrid.svelte';
+</script>
+
+<main>
+    <h1>商品管理</h1>
+    <ProductGrid />
+</main>
+
+<style>
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    h1 {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+</style>

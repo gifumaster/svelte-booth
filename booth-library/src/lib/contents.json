@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "title": "Sample Product 1",
+      "url": "https://example.com/product1",
+      "imgUrl": "https://via.placeholder.com/150",
+      "tags": []
+    },
+    {
+      "title": "Sample Product 2",
+      "url": "https://example.com/product2",
+      "imgUrl": "https://via.placeholder.com/150",
+      "tags": []
+    }
+  ]
+}
