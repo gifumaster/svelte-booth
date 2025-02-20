@@ -1,6 +1,7 @@
 <script lang="ts">
     import { productStore, type Product } from '../stores/productStore';
     import TagDialog from './TagDialog.svelte';
+    import { Link2, Tag } from 'lucide-svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let { items, selectedTags } = $derived($productStore);
@@ -57,15 +58,32 @@
                 oncontextmenu={(e) => handleContextMenu(e, product)}
             >
                 <img src={product.imgUrl} alt={product.title} />
-                <h4>{product.title}</h4>
+                <div class="title-actions">
+                    <h4>{product.title}</h4>
+                    <div class="action-icons">
+                        <button 
+                            class="icon-button" 
+                            title="タグを編集"
+                            onclick={() => selectedProduct = product}
+                        >
+                            <Tag size={18} />
+                        </button>
+                        <a 
+                            href={product.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            class="icon-button" 
+                            title="商品ページへ"
+                        >
+                            <Link2 size={18} />
+                        </a>
+                    </div>
+                </div>
                 <div class="product-tags">
                     {#each product.tags as tag}
                         <span class="tag">{tag}</span>
                     {/each}
                 </div>
-                <a href={product.url} target="_blank" rel="noopener noreferrer">
-                    商品ページへ
-                </a>
             </div>
         {/each}
     </div>
@@ -74,6 +92,7 @@
         <TagDialog 
             product={selectedProduct}
             onClose={() => selectedProduct = null}
+            availableTags={allTags}
         />
     {/if}
 </div>
@@ -128,20 +147,43 @@
         border-radius: 4px;
     }
 
+    .title-actions {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .title-actions h4 {
+        margin: 0;
+        flex: 1;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .icon-button {
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
+
+    .icon-button:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
     .product-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 0.25rem;
-    }
-
-    .product-card a {
-        display: block;
-        text-align: center;
-        padding: 0.5rem;
-        background: #0d6efd;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        margin-top: auto;
     }
 </style>

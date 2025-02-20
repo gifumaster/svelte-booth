@@ -41,6 +41,7 @@
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
+		"lucide-svelte": "^0.475.0",
 		"svelte-local-storage-store": "^0.6.4"
 	}
 }
