@@ -6,13 +6,15 @@
 </script>
 
 {#if isOpen}
-    <div class="modal-backdrop" on:click={onClose}>
-        <div class="modal" on:click|stopPropagation>
+ <!-- svelte-ignore a11y-click-events-have-key-events -->
+ <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="modal-backdrop" onclick={onClose}>
+        <div class="modal" onclick={(e) => e.stopPropagation()}>
             <h3>商品の削除</h3>
             <p>「{title}」を削除してもよろしいですか？</p>
             <div class="actions">
-                <button class="cancel-button" on:click={onClose}>キャンセル</button>
-                <button class="delete-button" on:click={() => {
+                <button class="cancel-button" onclick={onClose}>キャンセル</button>
+                <button class="delete-button" onclick={() => {
                     onConfirm();
                     onClose();
                 }}>削除</button>
