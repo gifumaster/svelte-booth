@@ -5,7 +5,7 @@
     import DeleteConfirmDialog from './DeleteConfirmDialog.svelte';
     import Toast from './Toast.svelte';
     import JsonUploader from './JsonUploader.svelte';
-    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon } from 'lucide-svelte';
+    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square } from 'lucide-svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let isJsonDialogOpen = $state(false);
@@ -62,6 +62,50 @@
             productToDelete = null;
         }
     }
+
+    // 複数選択モード用の状態
+    let isBulkSelectMode = $state(false);
+    let selectedProducts = $state<Set<string>>(new Set());
+
+    function toggleBulkSelectMode() {
+        isBulkSelectMode = !isBulkSelectMode;
+        if (!isBulkSelectMode) {
+            selectedProducts = new Set();
+        }
+    }
+
+    function toggleProductSelection(product: Product) {
+        const newSet = new Set(selectedProducts);
+        if (newSet.has(product.url)) {
+            newSet.delete(product.url);
+        } else {
+            newSet.add(product.url);
+        }
+        selectedProducts = newSet;
+    }
+
+    function addTagToBulkProducts(tag: string) {
+        const updatedItems = items.map(product => {
+            if (selectedProducts.has(product.url) && !product.tags.includes(tag)) {
+                return {
+                    ...product,
+                    tags: [...product.tags, tag]
+                };
+            }
+            return product;
+        });
+
+        productStore.update(store => ({
+            ...store,
+            items: updatedItems
+        }));
+
+        // 選択状態をリセット
+        selectedProducts = new Set();
+        isBulkSelectMode = false;
+
+        toastStore.show(`選択した商品に「${tag}」を追加しました`, 'success');
+    }
 </script>
 
 <Toast />
@@ -78,15 +122,25 @@
                 />
             </div>
             <div class="tag-filter">
-                <h3>タグフィルター</h3>
+                <div class="tag-header">
+                    <h3>タグフィルター</h3>
+                    <button 
+                        class="bulk-select-button"
+                        onclick={toggleBulkSelectMode}
+                        class:active={isBulkSelectMode}
+                        title="商品の複数選択モード"
+                    >
+                        <CheckSquareIcon size={20} />
+                    </button>
+                </div>
                 <div class="tag-list">
                     {#each masterTags as tag}
                         <button 
                             class="tag"
                             class:selected={selectedTags.includes(tag)}
-                            onclick={() => toggleTag(tag)}
+                            onclick={() => isBulkSelectMode && selectedProducts.size > 0 ? addTagToBulkProducts(tag) : toggleTag(tag)}
                             oncontextmenu={(e) => handleContextMenu(e, tag)}
-                            title="右クリックでタグを削除"
+                            title={isBulkSelectMode && selectedProducts.size > 0 ? "クリックで選択した商品にタグを追加" : "右クリックでタグを削除"}
                         >
                             {tag}
                         </button>
@@ -107,9 +161,21 @@
         {#each filteredProducts as product}
             <div 
                 class="product-card"
+                class:selected={selectedProducts.has(product.url)}
+                class:selecting={isBulkSelectMode}
+                onclick={() => isBulkSelectMode ? toggleProductSelection(product) : null}
             >
                 <div class="image-container">
                     <img src={product.imageUrl} alt={product.title} loading="lazy" />
+                    {#if isBulkSelectMode}
+                        <div class="checkbox-container">
+                            {#if selectedProducts.has(product.url)}
+                                <CheckSquareIcon size={20} class="checkbox-icon checked" />
+                            {:else}
+                                <Square size={20} class="checkbox-icon" />
+                            {/if}
+                        </div>
+                    {/if}
                     <div class="top-actions">
                         <button
                             class="icon-button delete-button"
@@ -176,10 +242,23 @@
     }
 
     .header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        padding: 1rem;
+        margin: -2rem -2rem 1rem -2rem;
+        box-shadow: 0 4px 12px -8px rgba(0, 0, 0, 0.15);
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(222, 226, 230, 0.6);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .header:hover {
+        box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.2);
     }
 
     .add-button {
@@ -225,6 +304,35 @@
         margin-bottom: 2rem;
     }
 
+    .tag-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .bulk-select-button {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .bulk-select-button:hover {
+        background-color: #e9ecef;
+    }
+
+    .bulk-select-button.active {
+        color: #0d6efd;
+        background-color: #e7f1ff;
+    }
+
     .tag-list {
         display: flex;
         flex-wrap: wrap;
@@ -260,6 +368,20 @@
         position: relative;
     }
 
+    .product-card.selected {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    }
+
+    .product-card.selecting {
+        cursor: pointer;
+    }
+
+    .product-card.selecting:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    }
+
     .image-container {
         position: relative;
         width: 100%;
@@ -271,6 +393,27 @@
         height: 140px;
         object-fit: cover;
         border-radius: 4px;
+    }
+
+    .checkbox-container {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .checkbox-icon {
+        color: #6c757d;
+    }
+
+    .checkbox-icon.checked {
+        color: #0d6efd;
     }
 
     .top-actions {

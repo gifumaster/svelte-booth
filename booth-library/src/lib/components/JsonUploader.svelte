@@ -70,7 +70,7 @@
                             </a>
                             をインストール
                         </li>
-                        <li>BOOTHのライブラリページを開く</li>
+                        <li>BOOTHの<a href="https://accounts.booth.pm/library">ライブラリページ</a>を開く</li>
                         <li>ページ右下に表示される「Extract All Pages」ボタンをクリック</li>
                         <li>生成されたJSONデータを下記の入力欄に貼り付け</li>
                         <li>以降、少しずつ追加する場合は「「Extract Current Pages」でOK</li>

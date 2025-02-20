@@ -123,7 +123,7 @@
         background: white;
         padding: 2rem;
         border-radius: 8px;
-        min-width: 300px;
+        min-width: 500px;
     }
 
     .current-tags {
