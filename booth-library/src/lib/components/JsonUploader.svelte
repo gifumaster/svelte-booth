@@ -50,7 +50,7 @@
     <div class="dialog-overlay" on:click={onClose}>
         <div class="dialog" on:click|stopPropagation>
             <div class="dialog-header">
-                <h2>JSON商品データの追加</h2>
+                <h2>商品データの追加</h2>
                 <button class="close-button" on:click={onClose}>&times;</button>
             </div>
             <div class="dialog-content">
@@ -78,7 +78,7 @@
                 </div>
                 <textarea
                     bind:value={jsonText}
-                    placeholder="ここにJSONデータを貼り付けてください"
+                    placeholder="ここに貼り付けてください"
                     rows="10"
                 ></textarea>
                 <div class="dialog-actions">

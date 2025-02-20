@@ -120,6 +120,9 @@
                     bind:value={searchQuery}
                     class="search-input"
                 />
+                <span class="product-count">
+                    {items.length}件中{filteredProducts.length}件表示中
+                </span>
             </div>
             <div class="tag-filter">
                 <div class="tag-header">
@@ -154,6 +157,7 @@
             title="商品データを追加"
         >
             <PlusCircleIcon size={24} />
+            ライブラリに追加
         </button>
     </div>
 
@@ -298,6 +302,12 @@
         outline: none;
         border-color: #0d6efd;
         box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    }
+
+    .product-count {
+        margin-bottom: 1rem;
+        color: #6c757d;
+        font-size: 0.9rem;
     }
 
     .tag-filter {
