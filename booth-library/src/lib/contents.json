@@ -7,8 +7,26 @@
       "tags": []
     },
     {
-      "title": "Sample Product 2",
+      "title": "Sample Product 1",
       "url": "https://example.com/product2",
+      "imgUrl": "https://via.placeholder.com/150",
+      "tags": []
+    },
+    {
+      "title": "Sample Product 1",
+      "url": "https://example.com/product3",
+      "imgUrl": "https://via.placeholder.com/150",
+      "tags": []
+    },
+    {
+      "title": "Sample Product 1",
+      "url": "https://example.com/product4",
+      "imgUrl": "https://via.placeholder.com/150",
+      "tags": []
+    },
+    {
+      "title": "Sample Product 2",
+      "url": "https://example.com/product5",
       "imgUrl": "https://via.placeholder.com/150",
       "tags": []
     }

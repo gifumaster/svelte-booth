@@ -1,7 +1,9 @@
 <script lang="ts">
     import { productStore, tagMasterStore, removeFromTagMaster, type Product } from '../stores/productStore';
+    import { toastStore } from '../stores/toastStore';
     import TagDialog from './TagDialog.svelte';
-    import { Link, Tag } from 'lucide-svelte';
+    import Toast from './Toast.svelte';
+    import { LinkIcon, TagIcon } from 'lucide-svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let { items, selectedTags } = $derived($productStore);
@@ -34,7 +36,7 @@
                 selectedTags: store.selectedTags.filter(t => t !== tag)
             }));
         } else {
-            alert('このタグは商品で使用されているため削除できません。');
+            toastStore.show('このタグは商品で使用されているため削除できません。', 'error');
         }
     }
 
@@ -43,6 +45,8 @@
         selectedProduct = product;
     }
 </script>
+
+<Toast />
 
 <div class="container">
     <div class="tag-filter">
@@ -77,7 +81,7 @@
                             title="タグを編集"
                             onclick={() => selectedProduct = product}
                         >
-                            <Tag size={18} />
+                            <TagIcon size={18} />
                         </button>
                         <a 
                             href={product.url} 
@@ -86,7 +90,7 @@
                             class="icon-button" 
                             title="商品ページへ"
                         >
-                            <Link size={18} />
+                            <LinkIcon size={18} />
                         </a>
                     </div>
                 </div>
