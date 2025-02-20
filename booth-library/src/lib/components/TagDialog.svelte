@@ -18,7 +18,7 @@
         productStore.update(store => ({
             ...store,
             items: store.items.map(item => 
-                item.title === product.title
+                item.url === product.url
                     ? { ...item, tags: [...item.tags, tagToAdd] }
                     : item
             )
@@ -30,7 +30,7 @@
         productStore.update(store => ({
             ...store,
             items: store.items.map(item => 
-                item.title === product.title
+                item.url === product.url
                     ? { ...item, tags: item.tags.filter(tag => tag !== tagToRemove) }
                     : item
             )
