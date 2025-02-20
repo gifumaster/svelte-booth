@@ -68,7 +68,7 @@ export const productStore = (() => {
                     product.tags.forEach(tag => addToTagMaster(tag));
                 });
 
-                const newItems = [...store.items, ...uniqueProducts];
+                const newItems = [...uniqueProducts, ...store.items];
                 
                 if (typeof window !== 'undefined') {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
