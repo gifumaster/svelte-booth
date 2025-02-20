@@ -140,14 +140,14 @@
 
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 1rem;
     }
 
     .product-card {
         border: 1px solid #dee2e6;
         border-radius: 8px;
-        padding: 0.75rem;
+        padding: 0.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
@@ -155,7 +155,8 @@
 
     .product-card img {
         width: 100%;
-        height: 160px;
+        aspect-ratio: 1;
+        height: 140px;
         object-fit: cover;
         border-radius: 4px;
     }
@@ -170,6 +171,15 @@
     .title-actions h4 {
         margin: 0;
         flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 2.5em;
+        font-size: 0.9rem;
+        line-height: 1.25;
     }
 
     .action-icons {
