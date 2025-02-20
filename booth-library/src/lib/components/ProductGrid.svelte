@@ -127,14 +127,14 @@
 
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
     }
 
     .product-card {
         border: 1px solid #dee2e6;
         border-radius: 8px;
-        padding: 1rem;
+        padding: 0.75rem;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
@@ -142,7 +142,7 @@
 
     .product-card img {
         width: 100%;
-        height: 200px;
+        height: 160px;
         object-fit: cover;
         border-radius: 4px;
     }
