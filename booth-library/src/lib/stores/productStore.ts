@@ -70,6 +70,35 @@ export const productStore = (() => {
 
                 const newItems = [...store.items, ...uniqueProducts];
                 
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+                }
+
+                return {
+                    ...store,
+                    items: newItems
+                };
+            });
+        },
+        deleteProduct: (url: string) => {
+            update(store => {
+                const productToDelete = store.items.find(item => item.url === url);
+                if (!productToDelete) return store;
+
+                const newItems = store.items.filter(item => item.url !== url);
+                
+                // 削除された商品のタグを他の商品が使用していない場合は、タグマスターからも削除
+                productToDelete.tags.forEach(tag => {
+                    const isTagUsed = newItems.some(item => item.tags.includes(tag));
+                    if (!isTagUsed) {
+                        removeFromTagMaster(tag);
+                    }
+                });
+
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+                }
+
                 return {
                     ...store,
                     items: newItems
@@ -118,28 +147,9 @@ const loadInitialData = async () => {
             items.forEach((item: Product) => {
                 item.tags.forEach((tag: string) => addToTagMaster(tag));
             });
-            return;
         } catch (error) {
             console.error('Failed to load stored data:', error);
         }
-    }
-
-    // ストアが空の場合のみ初期データを読み込む
-    try {
-        const response = await fetch('/src/lib/contents.json');
-        const data = await response.json();
-        
-        const products = data.map((item: any) => ({
-            ...item,
-            tags: [] as string[]
-        }));
-
-        productStore.update(store => ({
-            ...store,
-            items: products
-        }));
-    } catch (error) {
-        console.error('Failed to load initial data:', error);
     }
 };
 

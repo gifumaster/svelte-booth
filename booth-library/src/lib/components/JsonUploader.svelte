@@ -7,14 +7,6 @@
 
     let jsonText = '';
 
-    const exampleFormat = `[
-  {
-    "title": "商品タイトル",
-    "url": "https://booth.pm/ja/items/xxxxx",
-    "imageUrl": "https://booth.pm/images/xxxxx.jpg"
-  }
-]`;
-
     function handleSubmit() {
         try {
             const json = JSON.parse(jsonText);
@@ -62,9 +54,27 @@
                 <button class="close-button" on:click={onClose}>&times;</button>
             </div>
             <div class="dialog-content">
-                <div class="format-info">
-                    <p>以下の形式のJSONを入力してください：</p>
-                    <pre>{exampleFormat}</pre>
+                <div class="script-info">
+                    <h3>BOOTH Item Extractor 🔍</h3>
+                    <p>BOOTHの商品データを簡単に取得できるユーザースクリプトを使用できます：</p>
+                    <ol>
+                        <li>
+                            <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener noreferrer">
+                                Tampermonkey
+                            </a>
+                            をインストール
+                        </li>
+                        <li>
+                            <a href="https://greasyfork.org/ja/scripts/527522-booth-item-extractor" target="_blank" rel="noopener noreferrer">
+                                BOOTH Item Extractor
+                            </a>
+                            をインストール
+                        </li>
+                        <li>BOOTHのライブラリページを開く</li>
+                        <li>ページ右下に表示される「Extract All Pages」ボタンをクリック</li>
+                        <li>生成されたJSONデータを下記の入力欄に貼り付け</li>
+                        <li>以降、少しずつ追加する場合は「「Extract Current Pages」でOK</li>
+                    </ol>
                 </div>
                 <textarea
                     bind:value={jsonText}
@@ -98,8 +108,8 @@
         background: white;
         border-radius: 8px;
         width: 90%;
-        max-width: 600px;
-        max-height: 90vh;
+        max-width: 800px;
+        max-height: 95vh;
         display: flex;
         flex-direction: column;
     }
@@ -130,6 +140,40 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+    }
+
+    .script-info {
+        background: #e3f2fd;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .script-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #0d47a1;
+    }
+
+    .script-info p {
+        margin: 0 0 0.5rem 0;
+    }
+
+    .script-info ol {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .script-info li {
+        margin: 0.25rem 0;
+    }
+
+    .script-info a {
+        color: #1976d2;
+        text-decoration: none;
+    }
+
+    .script-info a:hover {
+        text-decoration: underline;
     }
 
     .format-info {

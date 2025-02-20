@@ -43,9 +43,16 @@
         }));
     }
 
+    function handleClose() {
+        if (newTag) {
+            addTag();
+        }
+        onClose();
+    }
+
     function handleOverlayClick(e: MouseEvent) {
         if (e.target === e.currentTarget) {
-            onClose();
+            handleClose();
         }
     }
 </script>
@@ -94,7 +101,7 @@
                 追加
             </button>
         </div>
-        <button class="close-button" onclick={onClose}>閉じる</button>
+        <button class="close-button" onclick={handleClose}>閉じる</button>
     </div>
 </div>
 
@@ -138,21 +145,48 @@
         display: flex;
         gap: 0.5rem;
         margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
     }
 
     .new-tag-form input {
         flex: 1;
         padding: 0.5rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .new-tag-form button {
+        padding: 0.5rem 1.5rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+
+    .new-tag-form button:hover {
+        background: #1d4ed8;
+    }
+
+    .new-tag-form button:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
     }
 
     .close-button {
-        width: 100%;
-        padding: 0.5rem;
+        margin: 0 auto;
+        padding: 0.5rem 2rem;
         background: #6c757d;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        display: block;
     }
 
     .available-tags {
