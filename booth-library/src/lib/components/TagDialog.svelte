@@ -6,23 +6,31 @@
         availableTags: string[];
     }>();
     let newTag = $state('');
+    let visibleTags = $state(availableTags);
+    
+    // productStoreを購読して現在の商品情報を取得
+    let currentProduct = $derived($productStore.items.find(item => item.url === product.url) || product);
 
     // 現在の商品に追加されていないタグをフィルタリング
     let availableNewTags = $derived(
-        availableTags.filter((tag: string) => !product.tags.includes(tag))
+        visibleTags.filter((tag: string) => !currentProduct.tags.includes(tag))
     );
 
     function addTag(tagToAdd: string = newTag) {
-        if (!tagToAdd || tagToAdd.length > 10 || product.tags.length >= 5) return;
+        if (!tagToAdd || tagToAdd.length > 10 || currentProduct.tags.length >= 20) return;
         
         productStore.update(store => ({
             ...store,
             items: store.items.map(item => 
-                item.url === product.url
+                item.url === currentProduct.url
                     ? { ...item, tags: [...item.tags, tagToAdd] }
                     : item
             )
         }));
+        // クリックされたタグを非表示にする
+        if (tagToAdd !== newTag) {
+            visibleTags = visibleTags.filter((tag: string) => tag !== tagToAdd);
+        }
         newTag = '';
     }
 
@@ -30,11 +38,15 @@
         productStore.update(store => ({
             ...store,
             items: store.items.map(item => 
-                item.url === product.url
+                item.url === currentProduct.url
                     ? { ...item, tags: item.tags.filter(tag => tag !== tagToRemove) }
                     : item
             )
         }));
+        // 除外したタグを利用可能なタグリストに戻す
+        if (!visibleTags.includes(tagToRemove)) {
+            visibleTags = [...visibleTags, tagToRemove];
+        }
     }
 
     function handleOverlayClick(e: MouseEvent) {
@@ -46,11 +58,11 @@
 
 <div class="dialog-overlay" onclick={handleOverlayClick}>
     <div class="dialog-content">
-        <h3>{product.title} - タグ管理</h3>
+        <h3>{currentProduct.title} - タグ管理</h3>
         
         <div class="current-tags">
             <h4>現在のタグ:</h4>
-            {#each product.tags as tag}
+            {#each currentProduct.tags as tag}
                 <button class="tag" onclick={() => removeTag(tag)}>
                     {tag} ×
                 </button>
@@ -65,7 +77,7 @@
                         <button 
                             class="tag available"
                             onclick={() => addTag(tag)}
-                            disabled={product.tags.length >= 5}
+                            disabled={currentProduct.tags.length >= 10}
                         >
                             {tag} +
                         </button>
@@ -83,7 +95,7 @@
             />
             <button 
                 onclick={() => addTag()}
-                disabled={!newTag || newTag.length > 10 || product.tags.length >= 5}
+                disabled={!newTag || newTag.length > 10 || currentProduct.tags.length >= 10}
             >
                 追加
             </button>
