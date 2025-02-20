@@ -55,7 +55,6 @@
         {#each filteredProducts as product}
             <div 
                 class="product-card"
-                oncontextmenu={(e) => handleContextMenu(e, product)}
             >
                 <img src={product.imgUrl} alt={product.title} />
                 <div class="title-actions">
