@@ -71,6 +71,8 @@
         isBulkSelectMode = !isBulkSelectMode;
         if (!isBulkSelectMode) {
             selectedProducts = new Set();
+        } else {
+            toastStore.show('商品を選択した後、タグをクリックすることで一括追加できます', 'info');
         }
     }
 
@@ -142,7 +144,8 @@
                         class="bulk-select-button"
                         onclick={toggleBulkSelectMode}
                         class:active={isBulkSelectMode}
-                        title="商品の複数選択モード"
+                        disabled={masterTags.length === 0}
+                        title={masterTags.length === 0 ? "タグマスターが空のため使用できません" : "商品の複数選択モード"}
                     >
                         <CheckSquareIcon size={20} />
                     </button>
