@@ -3,9 +3,11 @@
     import { toastStore } from '../stores/toastStore';
     import TagDialog from './TagDialog.svelte';
     import Toast from './Toast.svelte';
-    import { LinkIcon, TagIcon } from 'lucide-svelte';
+    import JsonUploader from './JsonUploader.svelte';
+    import { LinkIcon, TagIcon, PlusCircleIcon } from 'lucide-svelte';
 
     let selectedProduct = $state<Product | null>(null);
+    let isJsonDialogOpen = $state(false);
     let { items, selectedTags } = $derived($productStore);
     let masterTags = $derived($tagMasterStore);
 
@@ -49,21 +51,30 @@
 <Toast />
 
 <div class="container">
-    <div class="tag-filter">
-        <h3>タグフィルター</h3>
-        <div class="tag-list">
-            {#each masterTags as tag}
-                <button 
-                    class="tag"
-                    class:selected={selectedTags.includes(tag)}
-                    onclick={() => toggleTag(tag)}
-                    oncontextmenu={(e) => handleContextMenu(e, tag)}
-                    title="右クリックでタグを削除"
-                >
-                    {tag}
-                </button>
-            {/each}
+    <div class="header">
+        <div class="tag-filter">
+            <h3>タグフィルター</h3>
+            <div class="tag-list">
+                {#each masterTags as tag}
+                    <button 
+                        class="tag"
+                        class:selected={selectedTags.includes(tag)}
+                        onclick={() => toggleTag(tag)}
+                        oncontextmenu={(e) => handleContextMenu(e, tag)}
+                        title="右クリックでタグを削除"
+                    >
+                        {tag}
+                    </button>
+                {/each}
+            </div>
         </div>
+        <button 
+            class="add-button" 
+            onclick={() => isJsonDialogOpen = true}
+            title="商品データを追加"
+        >
+            <PlusCircleIcon size={24} />
+        </button>
     </div>
 
     <div class="product-grid">
@@ -102,6 +113,11 @@
         {/each}
     </div>
 
+    <JsonUploader 
+        isOpen={isJsonDialogOpen}
+        onClose={() => isJsonDialogOpen = false}
+    />
+    
     {#if selectedProduct}
         <TagDialog 
             product={selectedProduct}
@@ -113,6 +129,29 @@
 <style>
     .container {
         padding: 2rem;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .add-button {
+        background: none;
+        border: none;
+        color: #0d6efd;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+
+    .add-button:hover {
+        transform: scale(1.1);
     }
 
     .tag-filter {
@@ -151,6 +190,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        position: relative;
     }
 
     .product-card img {
@@ -161,10 +201,27 @@
         border-radius: 4px;
     }
 
+    .action-icons {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(255, 255, 255, 0.4);
+        padding: 0.25rem;
+        border-radius: 4px;
+        display: flex;
+        gap: 0.25rem;
+        z-index: 1;
+        opacity: 0.4;
+        transition: opacity 0.2s;
+    }
+
+    .product-card:hover .action-icons {
+        opacity: 1;
+    }
+
     .title-actions {
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
+        flex-direction: column;
         gap: 0.5rem;
     }
 
@@ -182,31 +239,40 @@
         line-height: 1.25;
     }
 
-    .action-icons {
-        display: flex;
-        gap: 0.25rem;
-    }
-
     .icon-button {
-        color: #0d6efd;
+        color: rgba(13, 110, 253, 0.8);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.25rem;
+        padding: 0.35rem;
         border-radius: 4px;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
         border: none;
-        background: none;
+        background: rgba(255, 255, 255, 0.4);
         cursor: pointer;
+        backdrop-filter: blur(1px);
     }
 
     .icon-button:hover {
-        background-color: rgba(13, 110, 253, 0.1);
+        background-color: rgba(255, 255, 255, 0.95);
+        transform: scale(1.1);
+        color: #0d6efd;
     }
 
     .product-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .product-tags .tag {
+        background: #f8f9fa;
+        color: #6c757d;
+        padding: 0.15rem 0.4rem;
+        border-radius: 12px;
+        cursor: default;
+        border: 1px solid #dee2e6;
+        font-size: 0.75rem;
     }
 </style>
