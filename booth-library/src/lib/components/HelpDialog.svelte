@@ -3,11 +3,13 @@
 </script>
 
 {#if showDialog}
-    <div class="modal-backdrop" on:click={() => showDialog = false}>
-        <div class="modal" on:click|stopPropagation>
+ <!-- svelte-ignore a11y-click-events-have-key-events -->
+ <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="modal-backdrop" onclick={() => showDialog = false}>
+        <div class="modal" onclick={(e) => e.stopPropagation}>
             <div class="modal-header">
                 <h3>ヘルプ</h3>
-                <button class="close-button" on:click={() => showDialog = false}>&times;</button>
+                <button class="close-button" onclick={() => showDialog = false}>&times;</button>
             </div>
             <div class="modal-content">
                 <section>
@@ -15,7 +17,7 @@
                     <ul>
                         <li>商品名による検索</li>
                         <li>タグによるフィルタリング（複数タグの組み合わせ可能）</li>
-                        <li>商品へのタグ付け（1商品につき最大20個まで）</li>
+                        <li>商品へのタグ付け（1商品につき最大10個まで）</li>
                         <li>複数商品の一括タグ付け機能</li>
                     </ul>
                 </section>

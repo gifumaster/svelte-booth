@@ -3,6 +3,10 @@
     import Title from '$lib/components/Title.svelte';
 </script>
 
+<svelte:head>
+    <title>Library Searcher For Booth</title>
+</svelte:head>
+
 <main>
     <ProductGrid />
     <Title />
