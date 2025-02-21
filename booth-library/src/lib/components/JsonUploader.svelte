@@ -22,7 +22,8 @@
                     item !== null &&
                     typeof item.title === 'string' &&
                     typeof item.url === 'string' &&
-                    typeof item.imageUrl === 'string'
+                    typeof item.imageUrl === 'string' &&
+                    (item.shop === undefined || typeof item.shop === 'string')
                 );
             });
 
@@ -47,11 +48,13 @@
 </script>
 
 {#if isOpen}
-    <div class="dialog-overlay" on:click={onClose}>
-        <div class="dialog" on:click|stopPropagation>
+ <!-- svelte-ignore a11y-click-events-have-key-events -->
+ <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="dialog-overlay" onclick={onClose}>
+        <div class="dialog" onclick={(e) => e.stopPropagation()}>
             <div class="dialog-header">
                 <h2>商品データの追加</h2>
-                <button class="close-button" on:click={onClose}>&times;</button>
+                <button class="close-button" onclick={onClose}>&times;</button>
             </div>
             <div class="dialog-content">
                 <div class="script-info">
@@ -82,8 +85,8 @@
                     rows="10"
                 ></textarea>
                 <div class="dialog-actions">
-                    <button class="cancel-button" on:click={onClose}>キャンセル</button>
-                    <button class="submit-button" on:click={handleSubmit}>追加</button>
+                    <button class="cancel-button" onclick={onClose}>キャンセル</button>
+                    <button class="submit-button" onclick={handleSubmit}>追加</button>
                 </div>
             </div>
         </div>

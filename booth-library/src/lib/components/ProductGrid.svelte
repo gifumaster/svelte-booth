@@ -224,6 +224,9 @@
                 </div>
                 <div class="title-actions">
                     <h4>{product.title}</h4>
+                    {#if product.shop}
+                        <span class="shop-name">{product.shop}</span>
+                    {/if}
                 </div>
                 <div class="product-tags">
                     {#each product.tags as tag}
@@ -564,5 +567,11 @@
         cursor: default;
         border: 1px solid #dee2e6;
         font-size: 0.75rem;
+    }
+
+    .shop-name {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
     }
 </style>

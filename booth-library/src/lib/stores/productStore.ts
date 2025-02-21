@@ -6,6 +6,7 @@ export interface Product {
     price?: number;
     imageUrl: string;
     tags: string[];
+    shop?: string;
 }
 
 const STORAGE_KEY = 'booth-library-products';
@@ -58,7 +59,16 @@ export const productStore = (() => {
         },
         addProducts: (newProducts: Product[]) => {
             update(store => {
-                // 既存のURLを持つ商品を除外
+                // 新しい商品と既存の商品をマージ
+                const updatedItems = store.items.map(existingProduct => {
+                    const newProduct = newProducts.find(p => p.url === existingProduct.url);
+                    if (newProduct?.shop && !existingProduct.shop) {
+                        return { ...existingProduct, shop: newProduct.shop };
+                    }
+                    return existingProduct;
+                });
+
+                // 完全に新しい商品（既存のURLを持たない商品）を追加
                 const uniqueProducts = newProducts.filter(newProduct => 
                     !store.items.some(existingProduct => existingProduct.url === newProduct.url)
                 );
@@ -68,15 +78,15 @@ export const productStore = (() => {
                     product.tags.forEach(tag => addToTagMaster(tag));
                 });
 
-                const newItems = [...uniqueProducts, ...store.items];
+                const finalItems = [...uniqueProducts, ...updatedItems];
                 
                 if (typeof window !== 'undefined') {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(finalItems));
                 }
 
                 return {
                     ...store,
-                    items: newItems
+                    items: finalItems
                 };
             });
         },
