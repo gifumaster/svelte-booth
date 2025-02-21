@@ -17,7 +17,9 @@
     let filteredProducts = $derived(
         items.filter(item => {
             const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => item.tags.includes(tag));
-            const matchesSearch = searchQuery === "" || item.title.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = searchQuery === "" || 
+                item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (item.shop && item.shop.toLowerCase().includes(searchQuery.toLowerCase()));
             return matchesTags && matchesSearch;
         })
     );
@@ -119,7 +121,7 @@
                 <div class="search-input-wrapper">
                     <input
                         type="text"
-                        placeholder="商品名で検索..."
+                        placeholder="商品名またはショップ名で検索..."
                         bind:value={searchQuery}
                         class="search-input"
                     />
