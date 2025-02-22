@@ -169,27 +169,25 @@
                         </div>
                     </div>
                     <div class="page-controls">
-                        {#if totalPages > 1}
-                            <div class="pagination">
-                                <button 
-                                    class="page-button" 
-                                    disabled={currentPage === 1}
-                                    onclick={() => goToPage(currentPage - 1)}
-                                >
-                                    <ChevronLeftIcon size={20} />
-                                </button>
-                                <span class="page-info">
-                                    {currentPage} / {totalPages}
-                                </span>
-                                <button 
-                                    class="page-button" 
-                                    disabled={currentPage === totalPages}
-                                    onclick={() => goToPage(currentPage + 1)}
-                                >
-                                    <ChevronRightIcon size={20} />
-                                </button>
-                            </div>
-                        {/if}
+                        <div class="pagination">
+                            <button 
+                                class="page-button" 
+                                disabled={currentPage === 1}
+                                onclick={() => goToPage(currentPage - 1)}
+                            >
+                                <ChevronLeftIcon size={20} />
+                            </button>
+                            <span class="page-info">
+                                {currentPage} / {totalPages}
+                            </span>
+                            <button 
+                                class="page-button" 
+                                disabled={currentPage === totalPages}
+                                onclick={() => goToPage(currentPage + 1)}
+                            >
+                                <ChevronRightIcon size={20} />
+                            </button>
+                        </div>
                         <div class="page-size-selector">
                             <ListIcon size={16} />
                             <select 
