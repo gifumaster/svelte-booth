@@ -54,7 +54,8 @@
             ...store,
             selectedTags: store.selectedTags.includes(tag)
                 ? store.selectedTags.filter(t => t !== tag)
-                : [...store.selectedTags, tag]
+                : [...store.selectedTags, tag],
+            currentPage: 1  // タグ切り替え時にページを1に戻す
         }));
     }
 
