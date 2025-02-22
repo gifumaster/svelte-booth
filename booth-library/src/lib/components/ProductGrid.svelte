@@ -5,10 +5,12 @@
     import DeleteConfirmDialog from './DeleteConfirmDialog.svelte';
     import Toast from './Toast.svelte';
     import JsonUploader from './JsonUploader.svelte';
-    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square, XCircleIcon } from 'lucide-svelte';
+    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square, XCircleIcon, StoreIcon } from 'lucide-svelte';
+    import ShopListDialog from './ShopListDialog.svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let isJsonDialogOpen = $state(false);
+    let isShopListOpen = $state(false);
     let searchQuery = $state("");
     let { items, selectedTags } = $derived($productStore);
     let masterTags = $derived($tagMasterStore);
@@ -125,15 +127,24 @@
                         bind:value={searchQuery}
                         class="search-input"
                     />
-                    {#if searchQuery}
+                    <div class="search-actions">
+                        {#if searchQuery}
+                            <button 
+                                class="clear-button" 
+                                onclick={() => searchQuery = ""}
+                                title="検索をクリア"
+                            >
+                                <XCircleIcon size={16} />
+                            </button>
+                        {/if}
                         <button 
-                            class="clear-button" 
-                            onclick={() => searchQuery = ""}
-                            title="検索をクリア"
+                            class="shop-list-button" 
+                            onclick={() => isShopListOpen = true}
+                            title="ショップ一覧を表示"
                         >
-                            <XCircleIcon size={16} />
+                            <StoreIcon size={16} />
                         </button>
-                    {/if}
+                    </div>
                 </div>
                 <span class="product-count">
                     {items.length}件中{filteredProducts.length}件表示中
@@ -190,9 +201,9 @@
                     {#if isBulkSelectMode}
                         <div class="checkbox-container">
                             {#if selectedProducts.has(product.url)}
-                                <CheckSquareIcon size={20} class="checkbox-icon checked" />
+                                <CheckSquareIcon size={20} style="color: #0d6efd;" />
                             {:else}
-                                <Square size={20} class="checkbox-icon" />
+                                <Square size={20} style="color: #6c757d;" />
                             {/if}
                         </div>
                     {/if}
@@ -257,6 +268,13 @@
         onConfirm={confirmDelete}
         onClose={() => productToDelete = null}
     />
+
+    <ShopListDialog
+        isOpen={isShopListOpen}
+        onClose={() => isShopListOpen = false}
+        products={items}
+        onShopSelect={(shop) => searchQuery = shop}
+    />
 </div>
 
 <style>
@@ -314,21 +332,27 @@
         max-width: 300px;
     }
 
+    .search-actions {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
     .search-input {
         width: 100%;
         max-width: 300px;
         padding: 0.5rem;
-        padding-right: 2rem;
+        padding-right: 4rem;
         border: 1px solid #dee2e6;
         border-radius: 4px;
         font-size: 1rem;
     }
 
     .clear-button {
-        position: absolute;
-        right: 0.5rem;
-        top: 50%;
-        transform: translateY(-50%);
         background: none;
         border: none;
         color: #6c757d;
@@ -342,6 +366,24 @@
 
     .clear-button:hover {
         color: #dc3545;
+    }
+
+    .shop-list-button {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .shop-list-button:hover {
+        color: #0d6efd;
+        background-color: #e9ecef;
     }
 
     .search-input:focus {
@@ -462,14 +504,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .checkbox-icon {
-        color: #6c757d;
-    }
-
-    .checkbox-icon.checked {
-        color: #0d6efd;
     }
 
     .top-actions {
