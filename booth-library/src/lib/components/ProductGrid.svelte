@@ -5,14 +5,14 @@
     import DeleteConfirmDialog from './DeleteConfirmDialog.svelte';
     import Toast from './Toast.svelte';
     import JsonUploader from './JsonUploader.svelte';
-    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square, XCircleIcon, StoreIcon } from 'lucide-svelte';
+    import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square, XCircleIcon, StoreIcon, ChevronLeftIcon, ChevronRightIcon, ListIcon } from 'lucide-svelte';
     import ShopListDialog from './ShopListDialog.svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let isJsonDialogOpen = $state(false);
     let isShopListOpen = $state(false);
     let searchQuery = $state("");
-    let { items, selectedTags } = $derived($productStore);
+    let { items, selectedTags, currentPage, pageSize } = $derived($productStore);
     let masterTags = $derived($tagMasterStore);
 
     // Filter products based on selected tags and search query
@@ -25,6 +25,27 @@
             return matchesTags && matchesSearch;
         })
     );
+
+    // ページネーション用の計算
+    let totalPages = $derived(Math.ceil(filteredProducts.length / pageSize));
+    let currentPageProducts = $derived(
+        filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    );
+
+    function goToPage(page: number) {
+        if (page >= 1 && page <= totalPages) {
+            productStore.update(store => ({
+                ...store,
+                currentPage: page
+            }));
+        }
+    }
+
+    const pageSizeOptions = [20, 100, 500];
+
+    function changePageSize(size: number) {
+        productStore.setPageSize(size);
+    }
 
     let productToDelete = $state<Product | null>(null);
 
@@ -120,34 +141,71 @@
     <div class="header">
         <div class="filters">
             <div class="search-box">
-                <div class="search-input-wrapper">
-                    <input
-                        type="text"
-                        placeholder="商品名またはショップ名で検索..."
-                        bind:value={searchQuery}
-                        class="search-input"
-                    />
-                    <div class="search-actions">
-                        {#if searchQuery}
+                <div class="search-actions-container">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            placeholder="商品名またはショップ名で検索..."
+                            bind:value={searchQuery}
+                            class="search-input"
+                        />
+                        <div class="search-actions">
+                            {#if searchQuery}
+                                <button 
+                                    class="clear-button" 
+                                    onclick={() => searchQuery = ""}
+                                    title="検索をクリア"
+                                >
+                                    <XCircleIcon size={16} />
+                                </button>
+                            {/if}
                             <button 
-                                class="clear-button" 
-                                onclick={() => searchQuery = ""}
-                                title="検索をクリア"
+                                class="shop-list-button" 
+                                onclick={() => isShopListOpen = true}
+                                title="ショップ一覧を表示"
                             >
-                                <XCircleIcon size={16} />
+                                <StoreIcon size={16} />
                             </button>
+                        </div>
+                    </div>
+                    <div class="page-controls">
+                        {#if totalPages > 1}
+                            <div class="pagination">
+                                <button 
+                                    class="page-button" 
+                                    disabled={currentPage === 1}
+                                    onclick={() => goToPage(currentPage - 1)}
+                                >
+                                    <ChevronLeftIcon size={20} />
+                                </button>
+                                <span class="page-info">
+                                    {currentPage} / {totalPages}
+                                </span>
+                                <button 
+                                    class="page-button" 
+                                    disabled={currentPage === totalPages}
+                                    onclick={() => goToPage(currentPage + 1)}
+                                >
+                                    <ChevronRightIcon size={20} />
+                                </button>
+                            </div>
                         {/if}
-                        <button 
-                            class="shop-list-button" 
-                            onclick={() => isShopListOpen = true}
-                            title="ショップ一覧を表示"
-                        >
-                            <StoreIcon size={16} />
-                        </button>
+                        <div class="page-size-selector">
+                            <ListIcon size={16} />
+                            <select 
+                                value={pageSize} 
+                                onchange={e => changePageSize(Number(e.currentTarget.value))}
+                                title="1ページあたりの表示件数"
+                            >
+                                {#each pageSizeOptions as size}
+                                    <option value={size}>{size}件</option>
+                                {/each}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <span class="product-count">
-                    {items.length}件中{filteredProducts.length}件表示中
+                    {items.length}件中{filteredProducts.length}件表示中 ({(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredProducts.length)}件)
                 </span>
             </div>
             <div class="tag-filter">
@@ -189,7 +247,7 @@
     </div>
 
     <div class="product-grid">
-        {#each filteredProducts as product}
+        {#each currentPageProducts as product}
             <div 
                 class="product-card"
                 class:selected={selectedProducts.has(product.url)}
@@ -326,10 +384,16 @@
         margin-bottom: 1rem;
     }
 
+    .search-actions-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
     .search-input-wrapper {
         position: relative;
-        width: 100%;
-        max-width: 300px;
+        width: 300px;
     }
 
     .search-actions {
@@ -609,5 +673,74 @@
         font-size: 0.8rem;
         color: #6c757d;
         margin-top: 0.25rem;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-button {
+        background: none;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 0.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .page-button:hover:not(:disabled) {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .page-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-info {
+        font-size: 0.9rem;
+        color: #6c757d;
+        min-width: 4rem;
+        text-align: center;
+    }
+
+    .page-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-size-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .page-size-selector select {
+        padding: 0.35rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: white;
+        color: #6c757d;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .page-size-selector select:hover {
+        border-color: #adb5bd;
+    }
+
+    .page-size-selector select:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
     }
 </style>

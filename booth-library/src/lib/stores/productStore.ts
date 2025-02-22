@@ -11,6 +11,7 @@ export interface Product {
 
 const STORAGE_KEY = 'booth-library-products';
 const TAG_STORAGE_KEY = 'booth-library-tags';
+const PAGE_SIZE_KEY = 'booth-library-page-size';
 
 // タグのマスターデータを管理するストア
 export const tagMasterStore = (() => {
@@ -38,24 +39,52 @@ export const tagMasterStore = (() => {
 
 // プロダクトを管理するストア
 export const productStore = (() => {
+    // 保存されたページサイズを読み込む
+    const storedPageSize = typeof window !== 'undefined' ? localStorage.getItem(PAGE_SIZE_KEY) : null;
+    const initialPageSize = storedPageSize ? parseInt(storedPageSize) : 100;
+
     const { subscribe, set, update } = writable<{
         items: Product[];
         selectedTags: string[];
+        currentPage: number;
+        pageSize: number;
     }>({
         items: [],
-        selectedTags: []
+        selectedTags: [],
+        currentPage: 1,
+        pageSize: initialPageSize
     });
 
     return {
         subscribe,
-        update: (fn: (store: { items: Product[]; selectedTags: string[] }) => { items: Product[]; selectedTags: string[] }) => {
+        update: (fn: (store: { 
+            items: Product[]; 
+            selectedTags: string[]; 
+            currentPage: number;
+            pageSize: number;
+        }) => { 
+            items: Product[]; 
+            selectedTags: string[];
+            currentPage: number;
+            pageSize: number;
+        }) => {
             update(store => {
                 const newStore = fn(store);
                 if (typeof window !== 'undefined') {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore.items));
+                    if (store.pageSize !== newStore.pageSize) {
+                        localStorage.setItem(PAGE_SIZE_KEY, newStore.pageSize.toString());
+                    }
                 }
                 return newStore;
             });
+        },
+        setPageSize: (size: number) => {
+            update(store => ({
+                ...store,
+                pageSize: size,
+                currentPage: 1 // ページサイズが変更されたら1ページ目に戻す
+            }));
         },
         addProducts: (newProducts: Product[]) => {
             update(store => {
