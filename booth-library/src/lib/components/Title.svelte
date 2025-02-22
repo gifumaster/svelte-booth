@@ -10,20 +10,26 @@
     }
 </script>
 
-<div 
-    class="title" 
-    on:click={() => showDialog = true}
-    on:keydown={handleKeydown}
-    role="button"
-    tabindex="0"
->
+<div class="title-container">
     <h2>Liberary Searcher For Booth</h2>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div 
+        class="help-icon"
+        onclick={() => showDialog = true}
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+    </div>
 </div>
 
 <HelpDialog bind:showDialog />
 
 <style>
-    .title {
+    .title-container {
         position: fixed;
         left: 20px;
         bottom: 20px;
@@ -33,9 +39,12 @@
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    .title:hover {
+    .title-container:hover {
         transform: translateY(-2px);
     }
 
@@ -48,5 +57,15 @@
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
+    }
+
+    .help-icon {
+        cursor: pointer;
+        color: #4a90e2;
+        transition: color 0.2s ease;
+    }
+
+    .help-icon:hover {
+        color: #845ec2;
     }
 </style>
