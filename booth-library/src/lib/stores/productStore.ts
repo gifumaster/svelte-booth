@@ -83,6 +83,39 @@ export const productStore = (() => {
                 }
             }
         });
+
+        // 他のウィンドウでのLocalStorageの変更を検知
+        window.addEventListener('storage', (event) => {
+            if (event.key === STORAGE_KEY && event.newValue) {
+                try {
+                    const items = JSON.parse(event.newValue) as Product[];
+                    update(store => ({
+                        ...store,
+                        items
+                    }));
+                } catch (error) {
+                    console.error('Failed to sync data from storage event:', error);
+                }
+            } else if (event.key === TAG_STORAGE_KEY && event.newValue) {
+                try {
+                    const tags = JSON.parse(event.newValue) as string[];
+                    tagMasterStore.update(() => tags);
+                } catch (error) {
+                    console.error('Failed to sync tags from storage event:', error);
+                }
+            } else if (event.key === PAGE_SIZE_KEY && event.newValue) {
+                try {
+                    const pageSize = parseInt(event.newValue);
+                    update(store => ({
+                        ...store,
+                        pageSize,
+                        currentPage: 1
+                    }));
+                } catch (error) {
+                    console.error('Failed to sync page size from storage event:', error);
+                }
+            }
+        });
     }
 
     return {
