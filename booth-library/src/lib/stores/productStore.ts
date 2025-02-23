@@ -55,6 +55,36 @@ export const productStore = (() => {
         pageSize: initialPageSize
     });
 
+    if (typeof window !== 'undefined') {
+        // タブがアクティブになったときにデータを再読み込み
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                const storedData = localStorage.getItem(STORAGE_KEY);
+                if (storedData) {
+                    try {
+                        const items = JSON.parse(storedData) as Product[];
+                        update(store => ({
+                            ...store,
+                            items
+                        }));
+                    } catch (error) {
+                        console.error('Failed to load stored data on visibility change:', error);
+                    }
+                }
+
+                const storedTags = localStorage.getItem(TAG_STORAGE_KEY);
+                if (storedTags) {
+                    try {
+                        const tags = JSON.parse(storedTags) as string[];
+                        tagMasterStore.update(() => tags);
+                    } catch (error) {
+                        console.error('Failed to load stored tags on visibility change:', error);
+                    }
+                }
+            }
+        });
+    }
+
     return {
         subscribe,
         update: (fn: (store: { 
