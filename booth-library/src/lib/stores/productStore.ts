@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import initData from '../init.json';
 
 export interface Product {
     url: string;
@@ -188,7 +189,7 @@ export const productStore = (() => {
                 if (!productToDelete) return store;
 
                 const newItems = store.items.filter(item => item.url !== url);
-                
+
                 // 削除された商品のタグを他の商品が使用していない場合は、タグマスターからも削除
                 productToDelete.tags.forEach(tag => {
                     const isTagUsed = newItems.some(item => item.tags.includes(tag));
@@ -251,6 +252,23 @@ const loadInitialData = async () => {
             });
         } catch (error) {
             console.error('Failed to load stored data:', error);
+        }
+    } else {
+        // LocalStorageにデータが存在しない場合、init.jsonから初期データを読み込む
+        try {
+            const items = initData.items as Product[];
+            productStore.update(store => ({
+                ...store,
+                items
+            }));
+            // タグマスターの更新
+            items.forEach((item: Product) => {
+                item.tags.forEach((tag: string) => addToTagMaster(tag));
+            });
+            // 初期データをLocalStorageに保存
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        } catch (error) {
+            console.error('Failed to load initial data:', error);
         }
     }
 };
