@@ -155,8 +155,13 @@ export const productStore = (() => {
                 // 新しい商品と既存の商品をマージ
                 const updatedItems = store.items.map(existingProduct => {
                     const newProduct = newProducts.find(p => p.url === existingProduct.url);
-                    if (newProduct?.shop && !existingProduct.shop) {
-                        return { ...existingProduct, shop: newProduct.shop };
+                    if (newProduct) {
+                        return {
+                            ...existingProduct,
+                            title: newProduct.title,
+                            imageUrl: newProduct.imageUrl,
+                            shop: newProduct.shop || existingProduct.shop
+                        };
                     }
                     return existingProduct;
                 });
