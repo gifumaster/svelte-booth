@@ -228,7 +228,7 @@
                     </button>
                 </div>
                 <div class="tag-list">
-                    {#each masterTags as tag}
+                    {#each masterTags.filter(tag => tag !== '非表示') as tag}
                         <button 
                             class="tag"
                             class:selected={selectedTags.includes(tag)}
@@ -239,6 +239,17 @@
                             {tag}
                         </button>
                     {/each}
+                    {#if masterTags.includes('非表示')}
+                        <button 
+                            class="tag"
+                            class:selected={selectedTags.includes('非表示')}
+                            onclick={() => isBulkSelectMode && selectedProducts.size > 0 ? addTagToBulkProducts('非表示') : toggleTag('非表示')}
+                            oncontextmenu={(e) => handleContextMenu(e, '非表示')}
+                            title={isBulkSelectMode && selectedProducts.size > 0 ? "クリックで選択した商品にタグを追加" : "右クリックでタグを削除"}
+                        >
+                            非表示
+                        </button>
+                    {/if}
                 </div>
             </div>
         </div>
