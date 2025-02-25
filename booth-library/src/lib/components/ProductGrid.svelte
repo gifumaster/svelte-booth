@@ -18,6 +18,13 @@
     // Filter products based on selected tags and search query
     let filteredProducts = $derived(
         items.filter(item => {
+            // 「非表示」タグが付いている商品は、「非表示」タグが選択されている場合のみ表示
+            const isHidden = selectedTags.includes('非表示');
+            if (item.tags.includes('非表示') && !isHidden) {
+                return false
+            }
+
+            // 通常のタグフィルタリング
             const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => item.tags.includes(tag));
             const matchesSearch = searchQuery === "" || 
                 item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -247,6 +254,8 @@
 
     <div class="product-grid">
         {#each currentPageProducts as product}
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->        
             <div 
                 class="product-card"
                 class:selected={selectedProducts.has(product.url)}
