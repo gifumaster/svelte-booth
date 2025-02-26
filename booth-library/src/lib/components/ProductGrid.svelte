@@ -7,6 +7,8 @@
     import JsonUploader from './JsonUploader.svelte';
     import { LinkIcon, TagIcon, PlusCircleIcon, TrashIcon, CheckSquareIcon, Square, XCircleIcon, StoreIcon, ChevronLeftIcon, ChevronRightIcon, ListIcon } from 'lucide-svelte';
     import ShopListDialog from './ShopListDialog.svelte';
+    import SplashScreen from './SplashScreen.svelte';
+    import { onMount } from 'svelte';
 
     let selectedProduct = $state<Product | null>(null);
     let isJsonDialogOpen = $state(false);
@@ -14,6 +16,18 @@
     let searchQuery = $state("");
     let { items, selectedTags, currentPage, pageSize } = $derived($productStore);
     let masterTags = $derived($tagMasterStore);
+    let isLoading = $state(true);
+    
+    onMount(() => {
+        // データ読み込み完了を模擬して少し遅延後にローディング状態を解除
+        const timer = setTimeout(() => {
+            isLoading = false;
+        }, 1500);
+        
+        return () => {
+            clearTimeout(timer);
+        }
+    });
 
     // Filter products based on selected tags and search query
     let filteredProducts = $derived(
@@ -144,6 +158,7 @@
 </script>
 
 <Toast />
+<SplashScreen isVisible={isLoading} />
 
 <div class="container">
     <div class="header">
