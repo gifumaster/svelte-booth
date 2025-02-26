@@ -762,4 +762,10 @@
         border-color: #0d6efd;
         box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
 </style>

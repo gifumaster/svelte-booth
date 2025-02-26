@@ -212,6 +212,14 @@ export const productStore = (() => {
                     items: newItems
                 };
             });
+        },
+        exportProducts: () => {
+            let exportProducts: Product[] = [];
+            update(store => {
+                exportProducts = store.items;
+                return store;
+            });
+            return JSON.stringify(exportProducts, null, 2);
         }
     };
 })();

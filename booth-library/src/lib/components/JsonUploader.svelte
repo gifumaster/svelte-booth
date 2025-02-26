@@ -1,6 +1,7 @@
 <script lang="ts">
     import { productStore, type Product } from '../stores/productStore';
     import { toastStore } from '../stores/toastStore';
+    import { DownloadIcon } from 'lucide-svelte';
 
     export let isOpen = false;
     export let onClose: () => void;
@@ -25,25 +26,36 @@
                     typeof item.imageUrl === 'string' &&
                     (item.shop === undefined || typeof item.shop === 'string')
                 );
-            });
+            }).map(item => ({
+                ...item,
+                tags: Array.isArray(item.tags) ? item.tags : []
+            }));
 
             if (validProducts.length === 0) {
                 throw new Error('有効な商品データが見つかりませんでした');
             }
 
-            // タグ配列を追加
-            const productsWithTags = validProducts.map(product => ({
-                ...product,
-                tags: [] as string[]
-            }));
-
-            productStore.addProducts(productsWithTags);
+            productStore.addProducts(validProducts);
             toastStore.show('商品情報を追加しました', 'success');
             jsonText = '';
             onClose();
         } catch (error) {
             toastStore.show(error instanceof Error ? error.message : 'JSONの解析に失敗しました', 'error');
         }
+    }
+
+    function exportProducts() {
+        const data = productStore.exportProducts();
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'booth-library-export.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toastStore.show('商品データをエクスポートしました', 'success');
     }
 </script>
 
@@ -53,7 +65,7 @@
     <div class="dialog-overlay" onclick={onClose}>
         <div class="dialog" onclick={(e) => e.stopPropagation()}>
             <div class="dialog-header">
-                <h2>商品データの追加</h2>
+                <h2>商品データの管理</h2>
                 <button class="close-button" onclick={onClose}>&times;</button>
             </div>
             <div class="dialog-content">
@@ -85,8 +97,20 @@
                     rows="10"
                 ></textarea>
                 <div class="dialog-actions">
-                    <button class="cancel-button" onclick={onClose}>キャンセル</button>
-                    <button class="submit-button" onclick={handleSubmit}>追加</button>
+                    <div class="dialog-actions-left">
+                        <button 
+                            class="export-button" 
+                            onclick={exportProducts}
+                            title="商品データをエクスポート"
+                        >
+                            <DownloadIcon size={20} />
+                            エクスポート
+                        </button>
+                    </div>
+                    <div class="dialog-actions-right">
+                        <button class="cancel-button" onclick={onClose}>キャンセル</button>
+                        <button class="submit-button" onclick={handleSubmit}>追加</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,8 +234,36 @@
 
     .dialog-actions {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .dialog-actions-left {
+        display: flex;
         gap: 0.5rem;
-        justify-content: flex-end;
+    }
+
+    .dialog-actions-right {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .export-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #198754;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .export-button:hover {
+        background: #157347;
     }
 
     button {
