@@ -1,15 +1,18 @@
 <script lang="ts">
+  const shareUrl = encodeURIComponent('https://gifumaster.github.io/booth-library/');
+  const shareText = encodeURIComponent('Boothのアイテムをブラウザで管理！');
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`;
 </script>
 
 <div class="fixed-nav">
-  <a href="https://accounts.booth.pm/wish_lists" target="_blank" rel="noopener noreferrer">
-    <button class="nav-button">♡スキ</button>
+  <a href="https://gifumaster.github.io/simple_resizer/" target="_blank" rel="noopener noreferrer">
+    <button class="nav-button">アバターサムネイル作成</button>
   </a>
   <a href="https://accounts.booth.pm/library" target="_blank" rel="noopener noreferrer">
-    <button class="nav-button">ライブラリ</button>
+    <button class="nav-button">Booth:ライブラリ</button>
   </a>
-  <a href="https://accounts.booth.pm/orders?total=0&auto=0&page=1" target="_blank" rel="noopener noreferrer">
-    <button class="nav-button">購入履歴</button>
+  <a href={twitterUrl} target="_blank" rel="noopener noreferrer">
+    <button class="nav-button">Twitterでシェア</button>
   </a>
 </div>
 
