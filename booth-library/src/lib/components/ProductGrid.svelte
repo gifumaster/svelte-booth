@@ -572,7 +572,7 @@
 
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(var(--grid-columns), 1fr);
+        grid-template-columns: repeat(var(--grid-columns), minmax(100px, 1fr));
         gap: 1rem;
         --grid-columns: var(--grid-columns-value, 6);
     }
