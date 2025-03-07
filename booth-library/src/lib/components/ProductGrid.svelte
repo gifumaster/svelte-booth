@@ -14,6 +14,7 @@
     let isJsonDialogOpen = $state(false);
     let isShopListOpen = $state(false);
     let searchQuery = $state("");
+    let gridColumns = $state(6); // 1行あたりの表示数（デフォルト6列）
     let { items, selectedTags, currentPage, pageSize } = $derived($productStore);
     let masterTags = $derived($tagMasterStore);
     let isLoading = $state(true);
@@ -63,9 +64,14 @@
     }
 
     const pageSizeOptions = [20, 100, 500];
+    const gridColumnOptions = [3, 4, 6, 8];
 
     function changePageSize(size: number) {
         productStore.setPageSize(size);
+    }
+
+    function changeGridColumns(columns: number) {
+        gridColumns = columns;
     }
 
     let productToDelete = $state<Product | null>(null);
@@ -155,6 +161,11 @@
 
         toastStore.show(`選択した商品に「${tag}」を追加しました`, 'success');
     }
+
+    let gridColumnsValue = $derived(gridColumns.toString());
+    $effect(() => {
+        document.documentElement.style.setProperty('--grid-columns-value', gridColumnsValue);
+    });
 </script>
 
 <Toast />
@@ -220,6 +231,17 @@
                             >
                                 {#each pageSizeOptions as size}
                                     <option value={size}>{size}件</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="grid-columns-selector">
+                            <select 
+                                value={gridColumns} 
+                                onchange={e => changeGridColumns(Number(e.currentTarget.value))}
+                                title="1行あたりの表示数"
+                            >
+                                {#each gridColumnOptions as columns}
+                                    <option value={columns}>{columns}列</option>
                                 {/each}
                             </select>
                         </div>
@@ -550,8 +572,9 @@
 
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        grid-template-columns: repeat(var(--grid-columns), 1fr);
         gap: 1rem;
+        --grid-columns: var(--grid-columns-value, 6);
     }
 
     .product-card {
@@ -586,9 +609,21 @@
     .product-card img {
         width: 100%;
         aspect-ratio: 1;
-        height: 140px;
-        object-fit: cover;
+        height: calc(140px * (6 / var(--grid-columns))); /* 列数に応じて画像サイズを調整 */
+        object-fit: contain;
         border-radius: 4px;
+        background:
+    repeating-linear-gradient(
+        45deg,
+        #f8f9fa,
+        #f8f9fa 5px,
+        #e9ecef 5px,
+        #e9ecef 10px
+    ),
+    radial-gradient(circle at center,
+        rgba(248, 249, 250, 0.8) 0%,
+        rgba(233, 236, 239, 0.8) 100%
+    );
     }
 
     .checkbox-container {
@@ -773,6 +808,34 @@
     }
 
     .page-size-selector select:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    }
+
+    .grid-columns-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .grid-columns-selector select {
+        padding: 0.35rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: white;
+        color: #6c757d;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .grid-columns-selector select:hover {
+        border-color: #adb5bd;
+    }
+
+    .grid-columns-selector select:focus {
         outline: none;
         border-color: #0d6efd;
         box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
