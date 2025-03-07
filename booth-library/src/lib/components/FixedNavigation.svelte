@@ -1,13 +1,15 @@
 <script lang="ts">
+  import HelpDialog from './HelpDialog.svelte';
+  let showDialog = $state(false);
   const shareUrl = encodeURIComponent('https://gifumaster.github.io/booth-library/');
   const shareText = encodeURIComponent('Boothのアイテムをブラウザで管理！');
   const twitterUrl = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`;
 </script>
 
 <div class="fixed-nav">
-  <a href="https://gifumaster.github.io/simple_resizer/" target="_blank" rel="noopener noreferrer">
-    <button class="nav-button">アバターサムネイル作成</button>
-  </a>
+  <button class="nav-button help-button" onclick={() => showDialog = true}>
+    ヘルプ
+  </button>
   <a href="https://accounts.booth.pm/library" target="_blank" rel="noopener noreferrer">
     <button class="nav-button">Booth:ライブラリ</button>
   </a>
@@ -15,6 +17,8 @@
     <button class="nav-button">Twitterでシェア</button>
   </a>
 </div>
+
+<HelpDialog bind:showDialog />
 
 <style>
   .fixed-nav {
@@ -42,5 +46,15 @@
     background-color: #f5f5f5;
     transform: translateY(-1px);
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .help-button {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+  }
+
+  .help-button:hover {
+    background-color: #0b5ed7;
   }
 </style>
