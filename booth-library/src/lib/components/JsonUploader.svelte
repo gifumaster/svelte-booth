@@ -8,13 +8,14 @@
 
     let jsonText = '';
 
-    function handleSubmit() {
+    async function handleSubmit() {
         try {
-            const json = JSON.parse(jsonText);
+            const parsed = JSON.parse(jsonText);
+            const json = Array.isArray(parsed) ? parsed : parsed?.items;
 
             // 配列形式のチェック
             if (!Array.isArray(json)) {
-                throw new Error('JSONは配列形式である必要があります');
+                throw new Error('JSONは配列、または items 配列を持つオブジェクトである必要があります');
             }
 
             const validProducts = json.filter((item): item is Product => {
@@ -35,7 +36,7 @@
                 throw new Error('有効な商品データが見つかりませんでした');
             }
 
-            productStore.addProducts(validProducts);
+            await productStore.addProducts(validProducts);
             toastStore.show('商品情報を追加しました', 'success');
             jsonText = '';
             onClose();
